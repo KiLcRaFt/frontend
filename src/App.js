@@ -1,73 +1,45 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css';
 
 function App() {
-  const [tooded, setTooded] = useState([]);
-  const idRef = useRef();
-  const nameRef = useRef();
-  const priceRef = useRef();
-  const isActiveRef = useRef();
+    const [pakiautomaadid, setPakiautomaadid] = useState([]);
+    const [pakiautomaadid2, setPakiautomaadid2] = useState([]);
 
-  useEffect(() => {
-    fetch("https://localhost:7094/tooded")
-        .then(res => res.json())
-        .then(json => setTooded(json));
-  }, []);
+    useEffect(() => {
+        fetch("https://localhost:7094/ParcelMachine")
+            .then(res => res.json())
+            .then(json => setPakiautomaadid(json));
+    }, []);
 
-  //////////////////////////////////////////////-->
+    useEffect(() => {
+        fetch("https://localhost:7094/ParcelMachine/smartpost")
+            .then(res => res.json())
+            .then(json => setPakiautomaadid2(json));
+    }, []);
 
-  function kustuta(index) {
-    fetch("https://localhost:7094/tooded/kustuta/" + index, {"method": "DELETE"})
-        .then(res => res.json())
-        .then(json => setTooded(json));
-  }
 
-  //////////////////////////////////////////////-->
-
-  function lisa() {
-    const uusToode = {
-      "id": Number(idRef.current.value),
-      "name": nameRef.current.value,
-      "price": Number(priceRef.current.value),
-      "isActive": isActiveRef.current.checked
-    }
-    fetch("https://localhost:7094/tooded/lisa", {"method": "POST", "body": JSON.stringify(uusToode)})
-        .then(res => res.json())
-        .then(json => setTooded(json));
-  }
-
-  //////////////////////////////////////////////-->
-
-  function dollariteks() {
-    const kurss = 1.1;                                      ////////////////////////
-    fetch("https://localhost:7094/tooded/hind-dollaritesse/" + kurss, {"method": "PATCH"})
-        .then(res => res.json())
-        .then(json => setTooded(json));
-  }
-
-  //////////////////////////////////////////////-->
-
-  return (
-      <div className="App">
-        <label>ID</label> <br />
-        <input ref={idRef} type="number" /> <br />
-        <label>Nimi</label> <br />
-        <input ref={nameRef} type="text" /> <br />
-        <label>Hind</label> <br />
-        <input ref={priceRef} type="number" /> <br />
-        <label>Aktiivne</label> <br />
-        <input ref={isActiveRef} type="checkbox" /> <br />
-        <button onClick={() => lisa()}>Lisa</button>
-        {tooded.map((toode, index) =>
-            <div>
-              <div>{toode.id}</div>
-              <div>{toode.name}</div>
-              <div>{toode.price}</div>
-              <button onClick={() => kustuta(index)}>x</button>
-            </div>)}
-        <button onClick={() => dollariteks()}>Muuda dollariteks</button>
-      </div>
-  );
+    return (
+        <div>
+            <div className="App">
+                <p>Omniva pakiautomaatid</p>
+                <select>
+                    {pakiautomaadid.map(automaat =>
+                        <option>
+                            {automaat.NAME}
+                        </option>)}
+                </select>
+            </div>
+            <div className="App">
+                <p>Smartpost pakiautomaatid</p>
+                <select>
+                    {pakiautomaadid2.map(automaat =>
+                        <option>
+                            {automaat.address} {automaat.city} {automaat.availability}
+                        </option>)}
+                </select>
+            </div>
+        </div>
+    );
 }
 
 export default App;
